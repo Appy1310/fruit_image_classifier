@@ -13,8 +13,8 @@ from datetime import datetime
 
 
 
-model = load_model("model_mobilenet_allfruits.h5")
-model_mobilenet = load_model('Base_model_Mobilenet.h5')
+model = load_model("./models/model_mobilenet_allfruits.h5")
+model_mobilenet = load_model('./models/Base_model_Mobilenet.h5')
 classes = ['apple','avocado', 'banana',  'kaki', 'lemon', 'orange', 'pumpkin']
 last_detected = datetime.now()
 
