@@ -6,10 +6,11 @@ import tensorflow.keras as keras
 from tensorflow.keras.models import load_model
 
 from tensorflow.keras.applications import mobilenet_v2
-from tensorflow.keras import preprocessing 
+from tensorflow.keras import preprocessing
 import numpy as np
 
-classes = ['apple','avocado', 'banana',  'kaki', 'lemon', 'orange', 'pumpkin']
+classes = ['apple', 'avocado', 'banana', 'kaki', 'lemon', 'orange', 'pumpkin']
+
 
 def write_image(out, frame):
     """
@@ -17,8 +18,8 @@ def write_image(out, frame):
     """
     if not os.path.exists(out):
         os.makedirs(out)
-    now = datetime.now() 
-    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S_%f") 
+    now = datetime.now()
+    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S_%f")
     filename = f'{out}{dt_string}.png'
     logging.info(f'write image {filename}')
     cv2.imwrite(filename, frame)
@@ -27,16 +28,16 @@ def write_image(out, frame):
 def key_action():
     # https://www.ascii-code.com/
     k = cv2.waitKey(1)
-    if k == 113: # q button
+    if k == 113:  # q button
         return 'q'
-    if k == 32: # space bar
+    if k == 32:  # space bar
         return 'space'
-    if k == 112: # p key
+    if k == 112:  # p key
         return 'p'
-    if k == 115: # s key
-        return 's' 
-    if k == 109: # m key
-        return 'm'       
+    if k == 115:  # s key
+        return 's'
+    if k == 109:  # m key
+        return 'm'
     return None
 
 
@@ -51,8 +52,9 @@ def init_cam(width, height):
     # Check success
     if not cap.isOpened():
         raise ConnectionError("Could not open video device")
-    
-    # Set properties. Each returns === True on success (i.e. correct resolution)
+
+    # Set properties. Each returns === True on success (i.e. correct
+    # resolution)
     assert cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     assert cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
@@ -71,8 +73,9 @@ def predict_frame(frame, model, classes):
     # continue with the pre-processing
     numpy_image = keras.preprocessing.image.img_to_array(frame_rgb)
     image_batch = np.expand_dims(numpy_image, axis=0)
-    processed_image = keras.applications.mobilenet_v2.preprocess_input(image_batch)
-    
+    processed_image = keras.applications.mobilenet_v2.preprocess_input(
+        image_batch)
+
     # make a prediction
     predictions = model.predict(processed_image)
 
@@ -80,17 +83,17 @@ def predict_frame(frame, model, classes):
     predictions_list = []
 
     for i in range(len(classes)):
-        predictions_temp = [classes[i], predictions[0,i].round(3)]
+        predictions_temp = [classes[i], predictions[0, i].round(3)]
         predictions_list.append(predictions_temp)
-    #convert list to string for writing on the frame
-    # using list comprehension 
-    predictions_str = ' '.join([str(elem) for elem in predictions_list]) 
+    # convert list to string for writing on the frame
+    # using list comprehension
+    predictions_str = ' '.join([str(elem) for elem in predictions_list])
     # convert the numpy array to string for writing on the frame
-    # predictions = np.array2string(predictions, precision=3, 
+    # predictions = np.array2string(predictions, precision=3,
     #                               separator=', ', suppress_small=True)
 
-
     return predictions_str
+
 
 def predict_frame_mobilenet(frame, model, classes):
     # convert from bgr to rgb
@@ -98,12 +101,13 @@ def predict_frame_mobilenet(frame, model, classes):
     # continue with the pre-processing
     numpy_image = keras.preprocessing.image.img_to_array(frame_rgb)
     image_batch = np.expand_dims(numpy_image, axis=0)
-    processed_image = keras.applications.mobilenet_v2.preprocess_input(image_batch)
-    
+    processed_image = keras.applications.mobilenet_v2.preprocess_input(
+        image_batch)
+
     # make a prediction
-    predictions = model.predict(processed_image)   
+    predictions = model.predict(processed_image)
 
     label_mobilenet = keras.applications.mobilenet_v2.decode_predictions(
-    predictions, top=5) 
+        predictions, top=5)
 
     return label_mobilenet
